@@ -45,16 +45,16 @@ public class SmartLaunch extends SequentialCommandGroup {
 
     /*
      * Parallel:
-     * - Target Drive Base
-     * Sequential:
-     * Sequential:
-     * - Start Hold
-     * - Wait .3s
-     * - Stop Hold
-     * - Rev Shooter
+     ** - Target Drive Base
+     ** Sequential:
+     ** Sequential:
+     *** - Start Hold
+     *** - Wait .3s
+     *** - Stop Hold
+     ** - Rev Shooter
      * Parallel:
-     * - Run Intake
-     * - Smart Feed
+     ** - Run Intake
+     ** - Smart Feed
      */
 
     addCommands(
@@ -74,7 +74,7 @@ public class SmartLaunch extends SequentialCommandGroup {
             new PrintCommand("Finished Launch / Nested Sequence")),
         new PrintCommand("Finished First Parallel"),
         parallel(
-            new InstantCommand(m_intake::intake, m_intake),
+            new InstantCommand(m_intake::run, m_intake),
             new FunctionalCommand(() -> {
             }, () -> {
               if (m_launcher.atSetpoint()) {
