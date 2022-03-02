@@ -13,14 +13,20 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.DefaultDrive;
+import frc.robot.commands.SmartLaunch;
 import frc.robot.subsystems.Drivebase;
 import frc.robot.subsystems.Hold;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Launcher;
+import frc.robot.subsystems.Limelight;
 
 public class RobotContainer {
 
   public static boolean debugMode = false;
+
+  // private final Limelight m_intakeLimelight = new
+  // Limelight("limelight-intake"); // .12
+  private final Limelight m_launcherLimelight = new Limelight("limelight"); // .11
 
   // Declare Subsystems
   private final Drivebase m_drivebase = new Drivebase();
@@ -74,6 +80,12 @@ public class RobotContainer {
         .whenPressed(new InstantCommand(m_drivebase::shiftHigh, m_drivebase));
 
     // GAME MECH CONTROLLER ######################
+
+    // Smart Launch
+    new JoystickButton(xbox1, Button.kY.value)
+        .whileHeld(new SmartLaunch(m_launcher, m_launcherLimelight, m_drivebase, m_intake,
+            m_hold));
+
     // Standard Intake (With Hold)
     new JoystickButton(xbox1, Button.kB.value).whenHeld(new StartEndCommand(() -> {
       m_intake.run();
