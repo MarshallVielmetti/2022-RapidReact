@@ -6,9 +6,17 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.DefaultDrive;
 import frc.robot.subsystems.Drivebase;
+import frc.robot.subsystems.Hold;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Launcher;
 
 public class RobotContainer {
 
@@ -16,6 +24,9 @@ public class RobotContainer {
 
   // Declare Subsystems
   private final Drivebase m_drivebase = new Drivebase();
+  private final Intake m_intake = new Intake();
+  private final Hold m_hold = new Hold();
+  private final Launcher m_launcher = new Launcher();
 
   // Declare Controllers
   private final XboxController xbox0 = new XboxController(0); // Driver
@@ -32,6 +43,12 @@ public class RobotContainer {
     // Set Default Commands
     m_drivebase.setDefaultCommand(
         new DefaultDrive(m_drivebase, xbox0::getRightTriggerAxis, xbox0::getLeftTriggerAxis, xbox0::getLeftX));
+
+    // Open Loop Intake - Bound to Left Joystick on Mech
+    m_intake.setDefaultCommand(new RunCommand(() -> m_intake.run(xbox1.getRightY()), m_intake));
+
+    // Open Loop Hold - Bound to Left Joystick on Mech
+    m_hold.setDefaultCommand(new RunCommand(() -> m_hold.run(xbox1.getRightY()), m_hold));
   }
 
   /**
@@ -43,6 +60,28 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    // DRIVER CONTROLLER ##########################
+    // SWITCH FRONT
+    new JoystickButton(xbox0, Button.kX.value)
+        .whenPressed(new InstantCommand(m_drivebase::switchFront, m_drivebase));
+
+    // FORCE LOW
+    new JoystickButton(xbox0, Button.kLeftBumper.value)
+        .whenPressed(new InstantCommand(m_drivebase::shiftLow, m_drivebase));
+
+    // FORCE HIGH
+    new JoystickButton(xbox0, Button.kRightBumper.value)
+        .whenPressed(new InstantCommand(m_drivebase::shiftHigh, m_drivebase));
+
+    // GAME MECH CONTROLLER ######################
+    // Standard Intake (With Hold)
+    new JoystickButton(xbox1, Button.kB.value).whenHeld(new StartEndCommand(() -> {
+      m_intake.run();
+      m_hold.run();
+    }, () -> {
+      m_intake.stop();
+      m_hold.stop();
+    }, m_intake, m_hold));
 
   }
 
