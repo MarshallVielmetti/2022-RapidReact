@@ -72,7 +72,7 @@ public final class Constants {
         public static final int kmidRightID = 14;
         public static final int krearRightID = 16;
 
-        public static final double kDRIVE_RAMP_RATE = 0.4; // bigger number = less acceleration
+        public static final double kDRIVE_RAMP_RATE = 0.3; // bigger number = less acceleration
 
         public static final double kSHIFT_DOWN_THRESHOLD = 900; // NEEDS CALCULATING // for autoshift
         public static final double kSHIFT_UP_THRESHOLD = 1150; // NEEDS CALCULATING // for autoshift
@@ -82,9 +82,9 @@ public final class Constants {
         // edu.wpi.first.wpilibj.DoubleSolenoid.Value;
         // public static final Value HIGH_GEAR = Value.kReverse; // ""
 
-        public static final double kHIGH_GEAR_SPEED_SCALING = 0.5;
+        public static final double kHIGH_GEAR_SPEED_SCALING = 0.7;
         public static final double kLOW_GEAR_SPEED_SCALING = 1;
-        public static final double kTURN_SCALING = 0.5;
+        public static final double kTURN_SCALING = 0.8;
 
         // FOR TARGETING
         public static final double kTurnP = 1 / 9;

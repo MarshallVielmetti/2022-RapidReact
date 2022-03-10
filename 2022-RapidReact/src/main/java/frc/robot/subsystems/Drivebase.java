@@ -6,10 +6,14 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.DrivebaseConstants.*;
 import static frc.robot.Constants.IntakeConstants.*;
+
+import java.util.function.DoubleSupplier;
+
 import static frc.robot.Constants.HoldConstants.*;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -46,7 +50,16 @@ public class Drivebase extends SubsystemBase {
   private final DoubleSolenoid shifter = new DoubleSolenoid(PneumaticsModuleType.REVPH, kLOW_FORWARD_CHANNEL,
       kHIGH_REVERSE_CHANNEL);
 
-  private double m_speedScaling = kLOW_GEAR_SPEED_SCALING; // Not a great solution
+  // private double m_speedScaling = kLOW_GEAR_SPEED_SCALING; // Not a great solution
+  
+  //Over the top solution
+  private DoubleSupplier m_smartSpeedScaling = () -> {
+    if (this.getGear() == Value.kReverse) {
+      return kLOW_GEAR_SPEED_SCALING;
+    } 
+    return kHIGH_GEAR_SPEED_SCALING;
+  };
+
   private boolean m_isSwitchFront = false;
 
   // final XboxController xbox0;
@@ -60,6 +73,13 @@ public class Drivebase extends SubsystemBase {
     m_motorR1.setOpenLoopRampRate(kDRIVE_RAMP_RATE);
     m_motorR2.setOpenLoopRampRate(kDRIVE_RAMP_RATE);
     m_motorR3.setOpenLoopRampRate(kDRIVE_RAMP_RATE);
+
+    m_motorL1.setIdleMode(IdleMode.kCoast);
+    m_motorL2.setIdleMode(IdleMode.kCoast);
+    m_motorL3.setIdleMode(IdleMode.kCoast);
+    m_motorR1.setIdleMode(IdleMode.kCoast);
+    m_motorR2.setIdleMode(IdleMode.kCoast);
+    m_motorR3.setIdleMode(IdleMode.kCoast);
 
     m_left.setInverted(true);
 
@@ -79,11 +99,11 @@ public class Drivebase extends SubsystemBase {
 
     if (m_isSwitchFront)
       m_drive.arcadeDrive(
-          -robotOutput * m_speedScaling,
+          -robotOutput * m_smartSpeedScaling.getAsDouble(),
           turnAmount * kTURN_SCALING);
     else
       m_drive.arcadeDrive(
-          robotOutput * m_speedScaling,
+          robotOutput * m_smartSpeedScaling.getAsDouble(),
           turnAmount * kTURN_SCALING);
 
   }
@@ -108,12 +128,10 @@ public class Drivebase extends SubsystemBase {
 
   public void shiftHigh() {
     shifter.set(Value.kForward);
-    m_speedScaling = kHIGH_GEAR_SPEED_SCALING;
   }
 
   public void shiftLow() {
     shifter.set(Value.kReverse);
-    m_speedScaling = kLOW_GEAR_SPEED_SCALING;
   }
 
   public void stopMotors() {
